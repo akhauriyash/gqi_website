@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lumen — component kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS  — warm editorial-tech
+   Synthesised from Airspeed (clean SaaS) + Trajectory (editorial)
+   ============================================================ */
+:root{
+  /* paper / ink */
+  --paper:#F4F1E8;          /* warm cream page bg */
+  --paper-2:#EEEADD;        /* slightly deeper band */
+  --card:#FCFBF6;           /* lifted card */
+  --ink:#1A1813;            /* warm near-black (not pure black) */
+  --ink-2:#56524744;        /* unused placeholder */
+  --text:#33302A;           /* body text */
+  --text-soft:#6E6A5E;      /* secondary text */
+  --muted:#B7B2A2;          /* two-tone headline gray */
+  --hair:#E2DDCE;           /* hairline border */
+
+  /* accents */
+  --flame:#EC6B3E;          /* PRIMARY accent / CTA */
+  --flame-deep:#8A3216;
+  --apricot:#F6B25C;        /* warm amber */
+  --peach:#F4CBA6;          /* soft peach (pills / gradient) */
+  --lilac:#CFCBF2;          /* lavender card */
+  --mint:#C2E4C4;           /* mint card / success */
+  --sage:#37624A;           /* deep green text on mint */
+
+  /* dark / blueprint */
+  --navy:#1E2A37;
+  --navy-2:#15202B;
+  --cyan:#9DEBDD;
+  --cyan-dim:#5FA89B;
+
+  /* fonts */
+  --sans:'Hanken Grotesk', system-ui, sans-serif;
+  --serif:'Fraunces', Georgia, serif;
+  --mono:'JetBrains Mono', ui-monospace, monospace;
+
+  /* radii */
+  --r-sm:10px; --r:16px; --r-lg:22px; --r-xl:28px; --pill:999px;
+
+  /* shadow */
+  --sh-sm:0 1px 2px rgba(26,24,19,.05), 0 3px 10px rgba(26,24,19,.05);
+  --sh:0 2px 4px rgba(26,24,19,.05), 0 22px 44px -16px rgba(26,24,19,.22);
+  --sh-lg:0 36px 90px -28px rgba(26,24,19,.42);
+}
+
+/* ============================================================ RESET */
+*{box-sizing:border-box; margin:0; padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.55;
+  position:relative;
+}
+/* page-wide grain overlay */
+body::after{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:999; opacity:.4;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+}
+img{max-width:100%; display:block}
+a{color:inherit; text-decoration:none}
+button{font-family:inherit; cursor:pointer; border:none; background:none}
+
+/* ============================================================ LAYOUT HELPERS */
+.wrap{max-width:1180px; margin:0 auto; padding:0 28px}
+.section{padding:78px 0; border-top:1px solid var(--hair)}
+.section--flush{border-top:none}
+
+/* spec caption that frames each component group */
+.spec{
+  display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;
+  font-family:var(--mono); font-size:11px; letter-spacing:.06em;
+  color:var(--text-soft); margin-bottom:26px;
+}
+.spec b{
+  background:var(--ink); color:var(--paper); font-weight:500;
+  padding:3px 9px; border-radius:6px; letter-spacing:.1em;
+}
+.spec span{opacity:.85}
+
+/* eyebrow (numbered-section label) */
+.eyebrow{
+  display:inline-flex; align-items:center; gap:9px;
+  font-family:var(--mono); text-transform:uppercase;
+  font-size:12px; letter-spacing:.22em; color:var(--text-soft);
+  margin-bottom:22px;
+}
+.eyebrow .dot{width:7px; height:7px; border-radius:50%; background:var(--flame)}
+
+/* two-tone display headline (Airspeed signature) */
+.display{
+  font-weight:800; letter-spacing:-.035em; line-height:.98;
+  font-size:clamp(2.3rem, 5vw, 4.1rem); color:var(--ink);
+}
+.display .soft{color:var(--muted)}
+.display .serif{font-family:var(--serif); font-weight:400; font-style:italic; letter-spacing:-.01em}
+.lead{font-size:clamp(1.05rem,1.5vw,1.2rem); color:var(--text-soft); max-width:46ch; margin-top:20px}
+
+/* ============================================================ STICKY KIT HEADER */
+.kitbar{
+  position:sticky; top:0; z-index:50; backdrop-filter:saturate(1.4) blur(10px);
+  background:color-mix(in srgb, var(--paper) 82%, transparent);
+  border-bottom:1px solid var(--hair);
+}
+.kitbar .wrap{display:flex; align-items:center; gap:18px; height:54px}
+.kitbar .mk{display:flex; align-items:center; gap:9px; font-weight:800; letter-spacing:-.02em; color:var(--ink)}
+.kitnote{
+  margin-left:auto; font-family:var(--mono); font-size:11px; color:var(--text-soft);
+  display:flex; align-items:center; gap:8px;
+}
+.kitnote .pip{width:6px; height:6px; border-radius:50%; background:var(--apricot); box-shadow:0 0 0 3px color-mix(in srgb,var(--apricot) 30%, transparent)}
+
+/* mark (combined diamond/spark) */
+.mark{width:22px; height:22px; flex:none}
+.mark svg{display:block}
+
+/* ============================================================ 1 · TOKENS */
+#tokens{background:var(--paper)}
+.tok-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(118px,1fr)); gap:14px}
+.swatch{border-radius:var(--r-sm); overflow:hidden; border:1px solid var(--hair); background:var(--card)}
+.swatch .chip{height:64px}
+.swatch .meta{padding:8px 9px; font-family:var(--mono); font-size:10.5px; color:var(--text-soft)}
+.swatch .meta b{display:block; color:var(--ink); font-weight:600; font-size:11.5px; margin-bottom:2px; letter-spacing:-.01em}
+
+.type-row{display:grid; grid-template-columns:120px 1fr; gap:18px; align-items:baseline; padding:16px 0; border-bottom:1px dashed var(--hair)}
+.type-row .k{font-family:var(--mono); font-size:11px; color:var(--text-soft)}
+.scale-display{font-weight:800; letter-spacing:-.04em; color:var(--ink); font-size:2.4rem; line-height:1}
+.scale-h{font-weight:700; letter-spacing:-.02em; color:var(--ink); font-size:1.5rem}
+.scale-serif{font-family:var(--serif); font-style:italic; font-size:1.5rem; color:var(--ink)}
+.scale-body{font-size:1.0625rem; color:var(--text)}
+.scale-mono{font-family:var(--mono); font-size:.78rem; letter-spacing:.06em; color:var(--text-soft); text-transform:uppercase}
+
+.subgrid{display:grid; grid-template-columns:1fr 1fr; gap:40px}
+.minihead{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-soft); margin:34px 0 16px}
+.rad-row{display:flex; gap:14px; flex-wrap:wrap}
+.rad{width:84px; text-align:center; font-family:var(--mono); font-size:10px; color:var(--text-soft)}
+.rad .box{height:54px; background:var(--card); border:1px solid var(--hair); margin-bottom:6px}
+.sh-row{display:flex; gap:18px; flex-wrap:wrap}
+.sh{width:120px; height:74px; background:var(--card); border-radius:var(--r); display:grid; place-items:end center; padding-bottom:7px; font-family:var(--mono); font-size:10px; color:var(--text-soft)}
+
+/* ============================================================ 2 · BARS + NAV */
+.announce{
+  background:var(--ink); color:var(--paper); text-align:center;
+  font-size:13.5px; padding:10px 16px; letter-spacing:.01em; border-radius:var(--r-sm);
+}
+.announce a{ text-decoration:underline; text-underline-offset:3px; margin-left:8px; opacity:.92}
+
+.nav{
+  display:flex; align-items:center; gap:26px; padding:16px 22px;
+  border-radius:var(--r-lg); border:1px solid var(--hair); background:var(--card);
+}
+.nav.dark{background:var(--navy); border-color:#ffffff14; color:#EFece1}
+.nav .wm{font-weight:800; letter-spacing:-.02em; color:var(--ink); display:flex; align-items:center; gap:8px}
+.nav.dark .wm{color:#fff}
+.nav .links{display:flex; gap:22px; margin:0 auto; font-size:14.5px; color:var(--text)}
+.nav.dark .links{color:#cfcabb}
+.nav .links a{display:flex; align-items:center; gap:5px}
+.nav .links .car{opacity:.5; font-size:11px}
+.nav .right{display:flex; align-items:center; gap:16px}
+.nav .login{font-size:14.5px; color:var(--text)}
+.nav.dark .login{color:#cfcabb}
+
+/* ============================================================ 3 · BUTTONS + PILLS */
+.btn{
+  display:inline-flex; align-items:center; gap:9px;
+  font-weight:600; font-size:15px; letter-spacing:-.01em;
+  padding:13px 22px; border-radius:var(--pill);
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+  white-space:nowrap;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn .arr{transition:transform .2s ease}
+.btn:hover .arr{transform:translateX(3px)}
+.btn--flame{background:var(--flame); color:#fff; box-shadow:0 8px 22px -8px var(--flame)}
+.btn--flame:hover{background:#e15f31; box-shadow:0 12px 26px -8px var(--flame)}
+.btn--amber{background:var(--apricot); color:var(--ink)}
+.btn--ink{background:var(--ink); color:var(--paper)}
+.btn--ink:hover{background:#000}
+.btn--outline{background:transparent; color:var(--ink); box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn--outline:hover{background:var(--ink); color:var(--paper)}
+.btn--peach{background:var(--peach); color:var(--flame-deep)}
+.btn--cream{background:#F6F2D8; color:var(--ink); box-shadow:inset 0 0 0 1px #E6E0BC}
+.tlink{
+  display:inline-flex; align-items:center; gap:8px; font-weight:600; color:var(--ink);
+  border-bottom:1.5px solid var(--ink); padding-bottom:3px;
+}
+.tlink .arr{transition:transform .2s}
+.tlink:hover .arr{transform:translateX(4px)}
+
+.btn-row{display:flex; gap:14px; flex-wrap:wrap; align-items:center}
+
+/* pills / chips / badges */
+.pill{display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; padding:6px 13px; border-radius:var(--pill)}
+.pill--new{background:var(--ink); color:var(--paper); font-family:var(--mono); font-size:11px; letter-spacing:.08em}
+.pill--ghost{background:var(--card); border:1px solid var(--hair); color:var(--text); font-weight:500}
+.pill--soc{background:var(--mint); color:var(--sage); border:1px solid #A9D6AC}
+.chip{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; background:#EDE9DC; color:var(--text-soft); padding:5px 11px; border-radius:var(--pill)}
+.chip--mono{font-family:var(--mono); font-size:11px; background:transparent; color:var(--cyan-dim)}
+.status{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:var(--sage)}
+.status .led{width:8px; height:8px; border-radius:50%; background:#3FA45B; box-shadow:0 0 0 3px #3fa45b22}
+.status.warn{color:#9a6a17}
+.status.warn .led{background:var(--apricot); box-shadow:0 0 0 3px #f6b25c33}
+
+/* ============================================================ 4 · HERO */
+.hero{
+  position:relative; overflow:hidden; border-radius:var(--r-xl);
+  background:
+    radial-gradient(120% 90% at 85% -10%, #F7D9B6 0%, transparent 55%),
+    radial-gradient(120% 120% at 10% 0%, #E9E3F4 0%, transparent 50%),
+    linear-gradient(180deg,#F6F3EA, #F1ECDD);
+  border:1px solid var(--hair);
+  padding:54px 0 0;
+}
+.hero .wrap{position:relative; z-index:2}
+.hero .display{max-width:16ch}
+.hero .reveal{opacity:0; transform:translateY(14px); animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards}
+.hero .reveal.d1{animation-delay:.05s}
+.hero .reveal.d2{animation-delay:.15s}
+.hero .reveal.d3{animation-delay:.28s}
+.hero .reveal.d4{animation-delay:.42s}
+@keyframes rise{to{opacity:1; transform:none}}
+.hero-cta{display:flex; gap:14px; flex-wrap:wrap; margin-top:30px}
+
+/* paper-plane sketch (Trajectory nod) */
+.plane{position:absolute; right:6%; top:10%; width:140px; opacity:.9; z-index:1; animation:float 6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-12px) rotate(-2deg)}}
+
+/* product panel (Airspeed dashboard nod) */
+.panel{
+  margin-top:48px; background:var(--card); border-radius:var(--r-lg) var(--r-lg) 0 0;
+  border:1px solid var(--hair); border-bottom:none; box-shadow:var(--sh-lg);
+  padding:22px 22px 26px; transform:translateY(8px);
+}
+.panel-tabs{display:flex; gap:8px; align-items:center; margin-bottom:18px; flex-wrap:wrap}
+.tab{font-size:13.5px; color:var(--text-soft); padding:7px 12px; border-radius:9px}
+.tab.active{background:var(--ink); color:var(--paper); font-weight:600}
+.tab.txt{padding:7px 4px}
+.tab.txt.active{background:none; color:var(--ink); border-bottom:2px solid var(--flame); border-radius:0}
+.statrow{display:flex; gap:34px; flex-wrap:wrap; padding:14px 4px 20px; border-bottom:1px solid var(--hair); margin-bottom:18px}
+.stat .k{font-size:12px; color:var(--text-soft)}
+.stat .v{font-size:1.65rem; font-weight:800; letter-spacing:-.03em; color:var(--ink)}
+.deck{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px}
+.col-h{display:flex; justify-content:space-between; font-size:13.5px; font-weight:700; color:var(--ink); margin-bottom:8px}
+.col-h .n{background:#EDE9DC; color:var(--text-soft); font-family:var(--mono); font-size:11px; border-radius:6px; padding:1px 7px}
+.col-sub{font-size:12px; color:var(--text-soft); margin-bottom:12px}
+.deal{background:var(--card); border:1px solid var(--hair); border-radius:var(--r-sm); padding:12px; box-shadow:var(--sh-sm); margin-bottom:10px}
+.deal-top{display:flex; align-items:center; gap:9px; margin-bottom:9px}
+.logo{width:30px; height:30px; border-radius:8px; flex:none; display:grid; place-items:center; color:#fff; font-weight:800; font-size:13px}
+.deal-name{font-weight:700; font-size:14px; color:var(--ink); line-height:1.1}
+.deal-name small{display:block; font-weight:500; font-size:11.5px; color:var(--text-soft)}
+.deal-meta{display:flex; gap:14px; font-size:11.5px; color:var(--text-soft); margin-bottom:10px; flex-wrap:wrap}
+.dots{display:flex; gap:8px}
+.dots .d{display:flex; flex-direction:column; align-items:center; gap:4px; font-family:var(--mono); font-size:9px; color:var(--text-soft)}
+.dots .d .o{width:11px; height:11px; border-radius:50%}
+.g{background:#3FA45B} .a{background:var(--apricot)} .h{background:linear-gradient(90deg,var(--apricot) 50%,#E7E2D2 50%)} .r{background:#E0613F}
+
+/* ============================================================ 5 · INTEGRATION CARDS / FLOW */
+.split{display:grid; grid-template-columns:1.05fr 1fr; gap:60px; align-items:center}
+.flowpanel{
+  border-radius:var(--r-xl); padding:34px;
+  background:radial-gradient(120% 100% at 70% 0%, #F7D9B6, transparent 60%), linear-gradient(180deg,#EAE4F2,#F3D8BE);
+  border:1px solid var(--hair);
+}
+.icard{
+  background:var(--card); border:1px solid var(--hair); border-radius:var(--r); box-shadow:var(--sh);
+  padding:16px 18px; max-width:430px; transition:transform .2s ease, box-shadow .2s ease;
+}
+.icard:hover{transform:translateY(-3px); box-shadow:var(--sh-lg)}
+.icard .ih{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+.icard .ih .lg{width:26px; height:26px; border-radius:7px; display:grid; place-items:center; color:#fff; font-weight:800; font-size:11px; flex:none}
+.icard .ih b{font-size:14px; color:var(--ink)}
+.icard .ih span{font-size:13px; color:var(--text-soft)}
+.icard p{font-size:13.5px; color:var(--text); line-height:1.5}
+.icard p b{color:var(--ink)}
+.arrowdown{display:grid; place-items:center; color:var(--text-soft); height:26px; font-size:18px}
+
+/* ============================================================ 6 · BLUEPRINT / STICKY STORY */
+.story{
+  background:var(--navy); border-radius:var(--r-xl); overflow:hidden; color:#EDEAE0;
+  position:relative; border:1px solid #ffffff10;
+}
+.story-grid{display:grid; grid-template-columns:300px 1fr}
+.story-left{padding:42px 30px; position:sticky; top:0; align-self:start}
+.story-left .vsmall{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8aa0ad; margin-bottom:14px}
+.story-left h3{font-family:var(--serif); font-weight:500; font-size:1.9rem; line-height:1.12; color:#fff}
+.story-steps{padding:24px}
+.bp{
+  position:relative; min-height:360px; border-radius:var(--r-lg); overflow:hidden;
+  background:
+    linear-gradient(0deg,#ffffff05,#ffffff05),
+    var(--navy-2);
+  border:1px solid #ffffff12; margin-bottom:18px;
+  background-image:
+    linear-gradient(#ffffff0a 1px, transparent 1px),
+    linear-gradient(90deg,#ffffff0a 1px, transparent 1px);
+  background-size:64px 64px, 64px 64px;
+}
+.bp-label{position:absolute; left:18px; top:16px; font-family:var(--mono); font-size:11px; color:#8aa0ad; letter-spacing:.1em}
+.bp-step{position:absolute; left:18px; bottom:18px; right:18px}
+.bp-step .num{font-size:2.4rem; font-weight:800; color:#fff; line-height:1; border-left:3px solid var(--cyan); padding-left:12px}
+.bp-step h4{font-size:1.15rem; margin:14px 0 6px; color:#fff; font-weight:700}
+.bp-step p{font-size:13.5px; color:#aebcc6; max-width:42ch; font-family:var(--serif)}
+
+/* glow sphere */
+.sphere{
+  position:absolute; right:16%; top:24%; width:180px; height:180px; border-radius:50%;
+  background:
+    radial-gradient(circle at 38% 34%, #d8fff6 0%, #79d8c8 26%, #2f7d72 64%, #143a37 100%);
+  box-shadow:0 0 60px 6px #5fd6c455, inset 0 0 36px #0c2b2899;
+  animation:pulse 5s ease-in-out infinite;
+}
+.sphere::after{
+  content:""; position:absolute; inset:-26px; border-radius:50%;
+  background:radial-gradient(circle, #7fe6d540, transparent 62%);
+}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.node{position:absolute; font-family:var(--mono); font-size:10.5px; color:#cfe; border:1px solid #ffffff2e; border-radius:7px; padding:3px 9px; background:#ffffff0a}
+.connector{position:absolute; height:1px; background:linear-gradient(90deg,var(--cyan),transparent); transform-origin:left}
+.tinydot{position:absolute; width:7px; height:7px; border-radius:50%; background:var(--cyan); box-shadow:0 0 10px var(--cyan)}
+
+/* isometric stacked planes */
+.iso{position:absolute; right:7%; bottom:12%; width:260px; height:200px; perspective:900px}
+.plane{position:absolute; width:120px; height:150px; border:1.5px dashed #ffffff3a; border-radius:14px;
+  transform:rotateX(52deg) rotateZ(-42deg); box-shadow:0 0 22px #7fe6d533; background:#7fe6d50f}
+.plane.p2{transform:rotateX(52deg) rotateZ(-42deg) translate(46px,-60px); border-style:solid; border-color:var(--cyan); background:#7fe6d51a; box-shadow:0 0 30px #7fe6d555}
+.plane.p3{transform:rotateX(52deg) rotateZ(-42deg) translate(92px,-120px); border-style:solid; border-color:#bff6ec; box-shadow:0 0 30px #7fe6d566}
+
+/* ============================================================ 7 · FEATURE ACCORDION (expandable) */
+.features{display:flex; gap:14px; min-height:430px}
+.feat{
+  flex:1 1 0; min-width:0; position:relative; overflow:hidden; cursor:pointer;
+  border-radius:var(--r-lg); border:1px solid var(--hair);
+  transition:flex-grow .55s cubic-bezier(.2,.7,.2,1), background .4s;
+  padding:24px;
+}
+.feat.active{flex-grow:6}
+.feat[data-tone="lilac"]{background:linear-gradient(180deg,#E4E2F7,#EFEDFb)}
+.feat[data-tone="mint"]{background:linear-gradient(180deg,#D5ECD7,#E7F4E8)}
+.feat[data-tone="peach"]{background:linear-gradient(180deg,#F7DDC1,#FBEAD7)}
+.feat[data-tone="green"]{background:linear-gradient(180deg,#D7EBC9,#E9F4Dd)}
+.feat .ftop{display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:11px; color:var(--ink)}
+.feat .ico{width:22px; height:22px; opacity:.8}
+.feat h4{font-size:1.35rem; font-weight:700; color:var(--ink); margin:16px 0 8px; letter-spacing:-.02em; white-space:nowrap}
+.feat p{font-size:13.5px; color:#4a463c; max-width:46ch}
+.feat .pdim{color:#5a5648}
+.feat-illu{
+  margin-top:18px; height:0; opacity:0; overflow:hidden;
+  transition:height .5s ease, opacity .4s ease .1s;
+  border-radius:var(--r); background:var(--navy-2); border:1px solid #ffffff14;
+  background-image:linear-gradient(#ffffff09 1px,transparent 1px),linear-gradient(90deg,#ffffff09 1px,transparent 1px);
+  background-size:42px 42px,42px 42px;
+}
+.feat.active .feat-illu{height:210px; opacity:1; padding:16px}
+.feat.active p{white-space:normal}
+.feat:not(.active) p{display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+
+/* mini blueprint widgets inside feature illustrations */
+.bw-row{display:flex; align-items:center; justify-content:space-between; font-family:var(--mono); font-size:10px; color:#9fb3bd; padding:5px 9px; border:1px solid #ffffff14; border-radius:8px; margin-bottom:7px; background:#ffffff06}
+.bw-row .tag{color:var(--cyan); border:1px solid #ffffff22; border-radius:5px; padding:1px 7px}
+.bw-live{display:flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10px; color:var(--cyan); margin-bottom:10px}
+.bw-live .led{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.bw-curve{width:100%; height:120px}
+
+/* ============================================================ 8 · TRUST ACCORDION */
+.trust-grid{display:grid; grid-template-columns:300px 1fr; gap:0; border:1px solid var(--hair); border-radius:var(--r-lg); overflow:hidden}
+.trust-fig{
+  background:radial-gradient(120% 100% at 30% 10%, #EFE6F6, transparent), linear-gradient(180deg,#F6EFDF,#F2E6D2);
+  display:grid; place-items:center; padding:30px; min-height:330px;
+}
+.flyer{width:150px; opacity:.92; animation:float 7s ease-in-out infinite}
+.acc{border-left:1px solid var(--hair)}
+.acc-item{border-bottom:1px solid var(--hair)}
+.acc-item:last-child{border-bottom:none}
+.acc-head{display:flex; align-items:center; gap:14px; padding:22px 26px; width:100%; text-align:left}
+.acc-head .ai{width:20px; height:20px; opacity:.65; flex:none}
+.acc-head b{font-size:1.12rem; color:var(--ink); font-weight:700; letter-spacing:-.01em}
+.acc-head .chev{margin-left:auto; transition:transform .3s; color:var(--text-soft)}
+.acc-item.open .chev{transform:rotate(180deg)}
+.acc-body{max-height:0; overflow:hidden; transition:max-height .4s ease}
+.acc-item.open .acc-body{max-height:160px}
+.acc-body p{padding:0 26px 22px 60px; color:var(--text-soft); font-size:14.5px; max-width:60ch; font-family:var(--serif)}
+
+/* ============================================================ FOOTER */
+.foot{background:var(--navy); color:#cfcabb; border-radius:var(--r-xl) var(--r-xl) 0 0; margin-top:30px}
+.foot .wrap{padding:54px 28px 30px}
+.foot-top{display:flex; gap:40px; flex-wrap:wrap; justify-content:space-between; padding-bottom:34px; border-bottom:1px solid #ffffff14}
+.foot .wm{font-weight:800; color:#fff; font-size:1.4rem; display:flex; align-items:center; gap:9px}
+.foot .blurb{max-width:34ch; font-size:14px; margin-top:12px; color:#9fb0ba}
+.foot-cols{display:flex; gap:54px; flex-wrap:wrap}
+.foot-col h5{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#7e93a0; margin-bottom:14px}
+.foot-col a{display:block; font-size:14px; margin-bottom:9px; color:#cfcabb}
+.foot-col a:hover{color:#fff}
+.foot-bot{display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; padding-top:22px; font-size:12.5px; color:#8499a4; font-family:var(--mono)}
+
+/* ============================================================ section heading */
+.sec-title{font-weight:800; letter-spacing:-.03em; font-size:1.7rem; color:var(--ink); margin-bottom:6px}
+.sec-note{color:var(--text-soft); font-size:14.5px; max-width:62ch; margin-bottom:30px}
+
+/* ============================================================ RESPONSIVE */
+@media(max-width:880px){
+  .split, .story-grid, .trust-grid{grid-template-columns:1fr}
+  .story-left{position:static}
+  .subgrid{grid-template-columns:1fr}
+  .features{flex-direction:column; min-height:0}
+  .feat{flex-grow:0 !important}
+  .feat:not(.active) p{-webkit-line-clamp:3}
+  .feat.active .feat-illu{height:180px}
+  .nav .links{display:none}
+  .iso{display:none}
+  .plane{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== STICKY KIT HEADER ===== -->
+<header class="kitbar">
+  <div class="wrap">
+    <div class="mk">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 4l16 5-9 3-2 8-5-16z" fill="#1A1813"/></svg>
+      </span>
+      lumen <span style="font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text-soft)">/ component kit</span>
+    </div>
+    <div class="kitnote"><span class="pip"></span> placeholder copy — swap for your deck’s messaging</div>
+  </div>
+</header>
+
+<!-- ===== 1 · TOKENS ===== -->
+<section class="section section--flush" id="tokens">
+  <div class="wrap">
+    <div class="spec"><b>FOUNDATION</b><span>design tokens · the system everything else inherits from</span></div>
+    <h2 class="sec-title">Color</h2>
+    <p class="sec-note">Warm cream paper, warm-black ink, one coral accent that does the heavy lifting. A peach / lilac / mint family for soft surfaces, and a navy + cyan pair reserved for “blueprint” dark mode.</p>
+    <div class="tok-grid">
+      <div class="swatch"><div class="chip" style="background:#F4F1E8"></div><div class="meta"><b>paper</b>#F4F1E8</div></div>
+      <div class="swatch"><div class="chip" style="background:#FCFBF6"></div><div class="meta"><b>card</b>#FCFBF6</div></div>
+      <div class="swatch"><div class="chip" style="background:#1A1813"></div><div class="meta"><b>ink</b>#1A1813</div></div>
+      <div class="swatch"><div class="chip" style="background:#6E6A5E"></div><div class="meta"><b>text-soft</b>#6E6A5E</div></div>
+      <div class="swatch"><div class="chip" style="background:#B7B2A2"></div><div class="meta"><b>muted</b>#B7B2A2</div></div>
+      <div class="swatch"><div class="chip" style="background:#EC6B3E"></div><div class="meta"><b>flame ●</b>#EC6B3E</div></div>
+      <div class="swatch"><div class="chip" style="background:#F6B25C"></div><div class="meta"><b>apricot</b>#F6B25C</div></div>
+      <div class="swatch"><div class="chip" style="background:#F4CBA6"></div><div class="meta"><b>peach</b>#F4CBA6</div></div>
+      <div class="swatch"><div class="chip" style="background:#CFCBF2"></div><div class="meta"><b>lilac</b>#CFCBF2</div></div>
+      <div class="swatch"><div class="chip" style="background:#C2E4C4"></div><div class="meta"><b>mint</b>#C2E4C4</div></div>
+      <div class="swatch"><div class="chip" style="background:#1E2A37"></div><div class="meta"><b>navy</b>#1E2A37</div></div>
+      <div class="swatch"><div class="chip" style="background:#9DEBDD"></div><div class="meta"><b>cyan</b>#9DEBDD</div></div>
+    </div>
+
+    <div class="minihead">Type scale &amp; roles</div>
+    <div class="type-row"><div class="k">display / 800<br>-0.035em</div><div class="scale-display">Turn signal into action</div></div>
+    <div class="type-row"><div class="k">heading / 700</div><div class="scale-h">Agents that act, not alert.</div></div>
+    <div class="type-row"><div class="k">serif accent<br>Fraunces italic</div><div class="scale-serif">a living system, grounded in what happened</div></div>
+    <div class="type-row"><div class="k">body / 400<br>1.0625rem</div><div class="scale-body">Every call, every email, every ticket — connected into one persistent model your team can actually query.</div></div>
+    <div class="type-row"><div class="k">eyebrow / mono</div><div class="scale-mono">01 · the platform — auto-synced 38s ago</div></div>
+
+    <div class="minihead">Radius &amp; elevation</div>
+    <div class="subgrid">
+      <div>
+        <div class="rad-row">
+          <div class="rad"><div class="box" style="border-radius:10px"></div>sm · 10</div>
+          <div class="rad"><div class="box" style="border-radius:16px"></div>base · 16</div>
+          <div class="rad"><div class="box" style="border-radius:22px"></div>lg · 22</div>
+          <div class="rad"><div class="box" style="border-radius:28px"></div>xl · 28</div>
+          <div class="rad"><div class="box" style="border-radius:999px"></div>pill</div>
+        </div>
+      </div>
+      <div>
+        <div class="sh-row">
+          <div class="sh" style="box-shadow:var(--sh-sm)">sh-sm</div>
+          <div class="sh" style="box-shadow:var(--sh)">sh</div>
+          <div class="sh" style="box-shadow:var(--sh-lg)">sh-lg</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 2 · BARS + NAV ===== -->
+<section class="section">
+  <div class="wrap">
+    <div class="spec"><b>NAVIGATION</b><span>announcement bar → top nav (light + dark) · wordmark left · centered links · pill CTA right</span></div>
+    <div class="announce">lumen closes its Series A — the connective layer for revenue teams<a href="#">Read the note →</a></div>
+    <div style="height:18px"></div>
+    <nav class="nav">
+      <div class="wm"><span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M3 4l16 5-9 3-2 8-5-16z" fill="#1A1813"/></svg></span>lumen</div>
+      <div class="links">
+        <a>Product <span class="car">▾</span></a><a>Customers <span class="car">▾</span></a><a>Resources <span class="car">▾</span></a><a>Pricing</a>
+      </div>
+      <div class="right"><a class="login">Login</a><a class="btn btn--ink">Book a demo</a></div>
+    </nav>
+    <div style="height:14px"></div>
+    <nav class="nav dark">
+      <div class="wm"><span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M3 4l16 5-9 3-2 8-5-16z" fill="#fff"/></svg></span>lumen</div>
+      <div class="links"><a>Field Notes</a><a>Docs <span class="car">↗</span></a><a>Careers <span class="car">↗</span></a></div>
+      <div class="right"><a class="btn btn--peach">Get in touch</a><a class="btn btn--cream">Book a demo</a></div>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== 3 · BUTTONS + PILLS ===== -->
+<section class="section">
+  <div class="wrap">
+    <div class="spec"><b>CONTROLS</b><span>buttons · pills · chips · status — all pill-radius, subtle lift on hover, arrows nudge right</span></div>
+    <div class="minihead" style="margin-top:0">Buttons</div>
+    <div class="btn-row">
+      <button class="btn btn--flame">Book a demo <span class="arr">→</span></button>
+      <button class="btn btn--amber">Book a demo <span class="arr">→</span></button>
+      <button class="btn btn--ink">Book a call</button>
+      <button class="btn btn--outline">See it in action</button>
+      <button class="btn btn--peach">Get in touch</button>
+      <button class="btn btn--cream">Book a demo</button>
+      <a class="tlink">Try lumen <span class="arr">→</span></a>
+    </div>
+    <div class="minihead">Pills, chips &amp; status</div>
+    <div class="btn-row">
+      <span class="pill pill--new">NEW</span>
+      <span class="pill pill--ghost">The platform for continual learning</span>
+      <span class="pill pill--soc">◆ SOC 2 Certified</span>
+      <span class="chip">LinkedIn update</span>
+      <span class="chip">Acme · $184k deal</span>
+      <span class="chip">Stage 4</span>
+      <span class="chip chip--mono">↳ 18 calls cited</span>
+      <span class="chip chip--mono">auto-synced 38s ago</span>
+      <span class="status"><span class="led"></span> On track</span>
+      <span class="status warn"><span class="led"></span> Needs attention</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 4 · HERO ===== -->
+<section class="section">
+  <div class="wrap">
+    <div class="spec"><b>HERO</b><span>two-tone headline (ink + muted clause) → eyebrow pill → dual CTA → product panel on warm grain gradient</span></div>
+  </div>
+  <div class="hero">
+    <img class="plane" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 90'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23ffffff'/><stop offset='1' stop-color='%23f4cba6'/></linearGradient></defs><path d='M4 30 L116 8 L60 84 L48 56 Z' fill='url(%23g)' stroke='%23e8b98e' stroke-width='1'/><path d='M48 56 L60 84 L70 50 Z' fill='%23e9c7e8'/></svg>" alt="">
+    <div class="wrap">
+      <div class="reveal d1"><span class="pill pill--new" style="margin-bottom:20px">NEW · The platform for revenue teams</span></div>
+      <h1 class="display reveal d2">Turn every interaction into action.<br><span class="soft">lumen is the connective intelligence layer for modern teams.</span></h1>
+      <div class="hero-cta reveal d3">
+        <button class="btn btn--flame">Book a demo <span class="arr">→</span></button>
+        <button class="btn btn--outline">See lumen in action</button>
+      </div>
+
+      <div class="panel reveal d4">
+        <div class="panel-tabs">
+          <span class="tab active">⊞ Board</span><span class="tab">≣ List</span>
+          <span class="tab txt active" style="margin-left:10px">Main view</span><span class="tab txt">Closing</span><span class="tab txt">My deals</span>
+          <button class="btn btn--ink" style="margin-left:auto; padding:9px 16px; font-size:13px">↗ Submit forecast</button>
+        </div>
+        <div class="statrow">
+          <div class="stat"><div class="k">Total</div><div class="v">$2.7M</div></div>
+          <div class="stat"><div class="k">Weighted</div><div class="v">$1.7M</div></div>
+          <div class="stat"><div class="k">Pipeline</div><div class="v">$2.1M</div></div>
+          <div class="stat"><div class="k">Forecast</div><div class="v">$375K</div></div>
+          <div class="stat"><div class="k">Best case</div><div class="v">$230K</div></div>
+        </div>
+        <div class="deck">
+          <div>
+            <div class="col-h">Value Proposition <span class="n">5</span></div>
+            <div class="col-sub">Total $420K · Weighted $210K (50%)</div>
+            <div class="deal">
+              <div class="deal-top"><span class="logo" style="background:#635BFF">S</span><span class="deal-name">Stripe Annual<small>Stripe</small></span></div>
+              <div class="deal-meta"><span>$210K</span><span>Jessica</span><span>24d ago</span></div>
+              <div class="dots"><span class="d"><span class="o h"></span>M</span><span class="d"><span class="o g"></span>E</span><span class="d"><span class="o h"></span>D</span><span class="d"><span class="o g"></span>D</span><span class="d"><span class="o g"></span>I</span><span class="d"><span class="o g"></span>C</span><span class="d"><span class="o a"></span>C</span></div>
+            </div>
+            <div class="deal">
+              <div class="deal-top"><span class="logo" style="background:#58CC02">D</span><span class="deal-name">Duolingo Pilot<small>Duolingo</small></span></div>
+              <div class="deal-meta"><span>$60K</span><span>Jessica</span><span>24d ago</span></div>
+              <div class="dots"><span class="d"><span class="o g"></span>M</span><span class="d"><span class="o a"></span>E</span><span class="d"><span class="o g"></span>D</span><span class="d"><span class="o h"></span>D</span><span class="d"><span class="o g"></span>I</span><span class="d"><span class="o g"></span>C</span><span class="d"><span class="o a"></span>C</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="col-h">Decision Makers <span class="n">6</span></div>
+            <div class="col-sub">Total $795K · Weighted $477K (60%)</div>
+            <div class="deal">
+              <div class="deal-top"><span class="logo" style="background:#6E56CF">V</span><span class="deal-name">Elevate Seats<small>Vanta</small></span></div>
+              <div class="deal-meta"><span>$155K</span><span>Jessica</span><span>in 1d</span></div>
+              <div class="dots"><span class="d"><span class="o g"></span>M</span><span class="d"><span class="o g"></span>E</span><span class="d"><span class="o g"></span>D</span><span class="d"><span class="o g"></span>D</span><span class="d"><span class="o g"></span>I</span><span class="d"><span class="o g"></span>C</span><span class="d"><span class="o g"></span>C</span></div>
+            </div>
+            <div class="deal">
+              <div class="deal-top"><span class="logo" style="background:#0D0D0D">F</span><span class="deal-name">Figma Enterprise<small>Figma</small></span></div>
+              <div class="deal-meta"><span>$150K</span><span>Jessica</span><span>24d ago</span></div>
+              <div class="dots"><span class="d"><span class="o g"></span>M</span><span class="d"><span class="o g"></span>E</span><span class="d"><span class="o a"></span>D</span><span class="d"><span class="o g"></span>D</span><span class="d"><span class="o g"></span>I</span><span class="d"><span class="o g"></span>C</span><span class="d"><span class="o g"></span>C</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="col-h">Negotiation <span class="n">4</span></div>
+            <div class="col-sub">Total $540K · Weighted $459K (85%)</div>
+            <div class="deal">
+              <div class="deal-top"><span class="logo" style="background:#FF5A5F">A</span><span class="deal-name">Airbnb Year 1<small>Airbnb</small></span></div>
+              <div class="deal-meta"><span>$100K</span><span>Jessica</span><span>in 2d</span></div>
+              <div class="dots"><span class="d"><span class="o g"></span>M</span><span class="d"><span class="o g"></span>E</span><span class="d"><span class="o g"></span>D</span><span class="d"><span class="o g"></span>D</span><span class="d"><span class="o g"></span>I</span><span class="d"><span class="o g"></span>C</span><span class="d"><span class="o r"></span>C</span></div>
+            </div>
+            <div class="deal">
+              <div class="deal-top"><span class="logo" style="background:#1A1A1A">W</span><span class="deal-name">Waymo Pilot<small>Waymo</small></span></div>
+              <div class="deal-meta"><span>$220K</span><span>Jessica</span><span>in 4d</span></div>
+              <div class="dots"><span class="d"><span class="o g"></span>M</span><span class="d"><span class="o g"></span>E</span><span class="d"><span class="o g"></span>D</span><span class="d"><span class="o h"></span>D</span><span class="d"><span class="o g"></span>I</span><span class="d"><span class="o g"></span>C</span><span class="d"><span class="o a"></span>C</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 5 · NUMBERED SECTION + INTEGRATION CARDS ===== -->
+<section class="section">
+  <div class="wrap">
+    <div class="spec"><b>SECTION + CARDS</b><span>numbered eyebrow → two-tone heading → body → text-link · paired with stacked “integration cards” joined by flow arrows</span></div>
+    <div class="split">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> 01 · agents</div>
+        <h3 class="display" style="font-size:clamp(2rem,3.6vw,3rem)">Agents that <span class="soft">act, not alert.</span></h3>
+        <p class="lead">Detect a closed-won pattern, launch outbound. Spot a stalled deal, draft the re-engagement. lumen takes the action and leaves the receipt — you approve, it ships.</p>
+        <div style="margin-top:26px"><a class="tlink">Book a demo <span class="arr">→</span></a></div>
+      </div>
+      <div class="flowpanel">
+        <div class="icard">
+          <div class="ih"><span class="lg" style="background:#1A73E8">G</span><b>Gmail</b><span>· Re-engagement agent</span></div>
+          <p>Marcus attended <b>3 of the last 4 calls</b>. Promoting him to primary contact and re-routing the active sequence.</p>
+        </div>
+        <div class="arrowdown">↓</div>
+        <div class="icard">
+          <div class="ih"><span class="lg" style="background:#00A1E0">S</span><b>Salesforce</b><span>· Acme Corp</span></div>
+          <p>Stage moved to <b>Technical evaluation</b>. Champion field set to Marcus Chen. <span class="chip chip--mono">auto-synced 38s ago</span></p>
+        </div>
+        <div class="arrowdown">↓</div>
+        <div class="icard">
+          <div class="ih"><span class="lg" style="background:#4A154B">#</span><b>Slack</b><span>· #revenue-daily</span></div>
+          <p>Morning brief: <b>3 deals to watch</b>, $462k at risk. Drafts ready for your approval.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 6 · BLUEPRINT STORY ===== -->
+<section class="section">
+  <div class="wrap">
+    <div class="spec"><b>STORYTELLING</b><span>sticky-left heading + scrolling navy “blueprint” canvas · glowing cyan wireframe motif · numbered steps</span></div>
+    <div class="story">
+      <div class="story-grid">
+        <div class="story-left">
+          <div class="vsmall">The vision</div>
+          <h3>Every product of the future will be a living system.</h3>
+        </div>
+        <div class="story-steps">
+          <div class="bp">
+            <div class="bp-label">SIGNAL · just now</div>
+            <div class="sphere"></div>
+            <span class="node" style="right:13%; top:14%">lumen</span>
+            <span class="node" style="left:9%; bottom:42%">Product</span>
+            <span class="tinydot" style="left:30%; top:52%"></span>
+            <span class="tinydot" style="right:30%; top:40%"></span>
+            <div class="bp-step"><div class="num">1</div><h4>Signal from real usage</h4><p>Every edit, retry and accept is a signal. Behaviour reflects real task success more accurately than any benchmark.</p></div>
+          </div>
+          <div class="bp">
+            <div class="bp-label">STEER · learning loop</div>
+            <div class="sphere" style="right:10%; top:18%; width:150px; height:150px"></div>
+            <span class="node" style="right:26%; top:60%">feedback</span>
+            <div class="bp-step"><div class="num">2</div><h4>Steer the learning loop</h4><p>Model behaviour is something you shape, not something you wait for. Visualise traces, compare models, steer with your own feedback.</p></div>
+          </div>
+          <div class="bp">
+            <div class="bp-label">COMPOUND · intelligence</div>
+            <div class="iso"><span class="plane"></span><span class="plane p2"></span><span class="plane p3"></span></div>
+            <span class="node" style="right:30%; bottom:18%">Intelligence</span>
+            <div class="bp-step"><div class="num">3</div><h4>Intelligence that compounds</h4><p>Models, harness and prompts learn together — compounding every day into something more capable than yesterday.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7 · FEATURE ACCORDION ===== -->
+<section class="section">
+  <div class="wrap">
+    <div class="spec"><b>FEATURE PANELS</b><span>horizontal expandable cards · click to open · colored header + “x of 4” + blueprint illustration on expand</span></div>
+    <div style="text-align:center; margin-bottom:34px">
+      <div class="eyebrow" style="justify-content:center"><span class="dot"></span> the platform</div>
+      <h3 class="display" style="font-size:clamp(1.9rem,3.4vw,2.8rem)">A creative surface for your intelligence.</h3>
+      <p class="lead" style="margin:16px auto 0; text-align:center">Observe, direct and craft the intelligence behind your product.</p>
+    </div>
+    <div class="features" id="features">
+      <div class="feat active" data-tone="lilac">
+        <div class="ftop"><span class="ico">▤</span><span>1 of 4</span></div>
+        <h4>Instrument</h4>
+        <p>Plug lumen into your product with a lightweight SDK. Start capturing the signals your users already generate: traces, corrections, re-prompts, edits.</p>
+        <div class="feat-illu">
+          <div class="bw-live"><span class="led"></span> EVENT LOG · LIVE</div>
+          <div class="bw-row"><span>10:28:31</span><span class="tag">TRACE</span></div>
+          <div class="bw-row"><span>10:28:36</span><span class="tag">RETRY</span></div>
+          <div class="bw-row"><span>10:28:38</span><span class="tag">EDIT</span></div>
+          <div class="bw-row"><span>10:28:39</span><span class="tag">CORRECT</span></div>
+        </div>
+      </div>
+      <div class="feat" data-tone="mint">
+        <div class="ftop"><span class="ico">◎</span><span>2 of 4</span></div>
+        <h4>Understand</h4>
+        <p>See what your intelligence layer is learning. lumen surfaces patterns in real usage — healthy ones and failure ones — so nothing stays a black box.</p>
+        <div class="feat-illu">
+          <div class="bw-live"><span class="led"></span> PATTERN MAP</div>
+          <div class="bw-row"><span>retries on long context</span><span class="tag">12%</span></div>
+          <div class="bw-row"><span>edits when wrong tone</span><span class="tag">8%</span></div>
+          <div class="bw-row"><span>tool-selection ambiguity</span><span class="tag">5%</span></div>
+          <div class="bw-row"><span>successful simple queries</span><span class="tag">74%</span></div>
+        </div>
+      </div>
+      <div class="feat" data-tone="peach">
+        <div class="ftop"><span class="ico">◈</span><span>3 of 4</span></div>
+        <h4>Steer</h4>
+        <p>Direct what your intelligence layer optimises for. Shape behaviour with the precision of a control surface, and watch impact before / after.</p>
+        <div class="feat-illu">
+          <div class="bw-live"><span class="led"></span> MISSION CONTROL</div>
+          <div class="bw-row"><span>Quality</span><span class="tag">+18%</span></div>
+          <div class="bw-row"><span>Latency</span><span class="tag">−27%</span></div>
+          <div class="bw-row"><span>Cost</span><span class="tag">−12%</span></div>
+          <div class="bw-row"><span>Context · Harness · Models</span><span class="tag">tuned</span></div>
+        </div>
+      </div>
+      <div class="feat" data-tone="green">
+        <div class="ftop"><span class="ico">✦</span><span>4 of 4</span></div>
+        <h4>Learn</h4>
+        <p>lumen trains continuously on real usage and deploys improvements. Models, harness and prompts compound — quality climbs over time.</p>
+        <div class="feat-illu">
+          <div class="bw-live"><span class="led"></span> QUALITY · +12% vs prev</div>
+          <svg class="bw-curve" viewBox="0 0 300 120" preserveAspectRatio="none">
+            <polyline points="6,110 50,98 90,92 130,78 170,60 210,42 250,24 294,12" fill="none" stroke="#9DEBDD" stroke-width="2.5"/>
+            <line x1="6" y1="115" x2="294" y2="115" stroke="#ffffff22"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 8 · TRUST ACCORDION ===== -->
+<section class="section">
+  <div class="wrap">
+    <div class="spec"><b>TRUST</b><span>SOC-2 badge + illustrated figure + vertical accordion (click to expand) with line icons + serif body</span></div>
+    <div class="eyebrow"><span class="dot"></span> design for trust</div>
+    <h3 class="display" style="font-size:clamp(1.9rem,3.4vw,2.8rem); margin-bottom:14px">Your data. Trained and deployed on your terms.</h3>
+    <span class="pill pill--soc" style="margin-bottom:26px">◆ SOC 2 Certified</span>
+    <div class="trust-grid">
+      <div class="trust-fig">
+        <img class="flyer" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 130'><defs><linearGradient id='f' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23c9c6f0'/><stop offset='1' stop-color='%23f4cba6'/></linearGradient></defs><ellipse cx='60' cy='118' rx='34' ry='7' fill='%23e7c7e8' opacity='0.5'/><circle cx='60' cy='30' r='15' fill='url(%23f)'/><rect x='48' y='44' width='24' height='40' rx='11' fill='url(%23f)'/><rect x='40' y='50' width='12' height='30' rx='6' fill='%23c9c6f0' transform='rotate(20 46 65)'/><rect x='68' y='50' width='12' height='30' rx='6' fill='%23c9c6f0' transform='rotate(-20 74 65)'/><rect x='52' y='80' width='10' height='34' rx='5' fill='%23f4cba6' transform='rotate(8 57 97)'/><rect x='60' y='80' width='10' height='34' rx='5' fill='%23f4cba6' transform='rotate(-8 65 97)'/><path d='M60 120 q-20 6 -40 -2' stroke='%23f6b25c' stroke-width='5' fill='none' opacity='0.7'/></svg>" alt="">
+      </div>
+      <div class="acc" id="trustacc">
+        <div class="acc-item open">
+          <button class="acc-head"><span class="ai">⇄</span><b>You decide what trains</b><span class="chev">▾</span></button>
+          <div class="acc-body"><p>Full control over which data is used for training. High data-governance standards, so you define the boundaries of what your system learns from.</p></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-head"><span class="ai">➤</span><b>Nothing deploys without you</b><span class="chev">▾</span></button>
+          <div class="acc-body"><p>Every model update goes through your eval suite and approval workflow before it touches production. You decide what ships.</p></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-head"><span class="ai">◉</span><b>Full visibility</b><span class="chev">▾</span></button>
+          <div class="acc-body"><p>See exactly what the system learned, why it changed and how it performs. Every training run, every improvement, fully auditable.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <div>
+        <div class="wm"><span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M3 4l16 5-9 3-2 8-5-16z" fill="#fff"/></svg></span>lumen</div>
+        <p class="blurb">The connective intelligence layer for modern revenue teams. Built on persistent memory, orchestrated by agents that take action.</p>
+        <button class="btn btn--peach" style="margin-top:18px">Book a demo →</button>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col"><h5>Product</h5><a>Overview</a><a>Agents</a><a>Pricing</a><a>Changelog</a></div>
+        <div class="foot-col"><h5>Company</h5><a>About</a><a>Careers ↗</a><a>Field Notes</a><a>Contact</a></div>
+        <div class="foot-col"><h5>Resources</h5><a>Docs ↗</a><a>Security</a><a>Status</a><a>Privacy</a></div>
+      </div>
+    </div>
+    <div class="foot-bot"><span>© 2026 lumen, Inc.</span><span>SOC 2 Certified · Made for revenue teams</span></div>
+  </div>
+</footer>
+
+<script>
+/* feature panels: click to expand, others collapse */
+document.querySelectorAll('#features .feat').forEach(function(card){
+  card.addEventListener('click', function(){
+    document.querySelectorAll('#features .feat').forEach(function(c){ c.classList.remove('active'); });
+    card.classList.add('active');
+  });
+});
+
+/* trust accordion: toggle open */
+document.querySelectorAll('#trustacc .acc-head').forEach(function(head){
+  head.addEventListener('click', function(){
+    var item = head.parentElement;
+    var wasOpen = item.classList.contains('open');
+    document.querySelectorAll('#trustacc .acc-item').forEach(function(i){ i.classList.remove('open'); });
+    if(!wasOpen){ item.classList.add('open'); }
+  });
+});
+</script>
+</body>
+</html>
